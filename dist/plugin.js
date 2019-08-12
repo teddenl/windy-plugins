@@ -8,7 +8,7 @@ W.loadPlugin(
 /* Mounting options */
 {
   "name": "windy-plugin-gretathunberg",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Tedde de Boer @ Follow My Challenge",
   "repository": {
     "type": "git",
@@ -195,29 +195,9 @@ function () {
     });
   };
 
-  (function (i, s, o, g, r, a, m) {
-    i['GoogleAnalyticsObject'] = r;
-    i[r] = i[r] || function () {
-      (i[r].q = i[r].q || []).push(arguments);
-    }, i[r].l = 1 * new Date();
-    a = s.createElement(o), m = s.getElementsByTagName(o)[0];
-    a.async = 1;
-    a.src = g;
-    m.parentNode.insertBefore(a, m);
-  })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-  ga('multifmc.send', 'pageview');
-  ga('create', 'UA-64997129-25', {
-    'name': 'followmychallenge'
-  });
-  ga('followmychallenge.send', 'pageview');
   setInterval(function () {
     markerGroup.clearLayers();
     loadMap();
-    ga('create', 'UA-64997129-25', {
-      'name': 'followmychallenge'
-    });
-    ga('followmychallenge.send', 'event', 'Reloaders', 'auto_reload', location.pathname);
   }, 60000);
 
   var remove = function remove() {
