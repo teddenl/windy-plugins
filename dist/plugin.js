@@ -12,7 +12,7 @@ W.loadPlugin(
   "author": "Tedde de Boer @ Follow My Challenge",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/windycom/windy-plugins"
+    "url": "git+https://github.com/teddenl/windy-plugins"
   },
   "description": "Live GPS Tracker for Greta Thunberg's ocean crossing.",
   "displayName": "Greta Thunberg",
@@ -22,7 +22,7 @@ W.loadPlugin(
 /* HTML */
 '',
 /* CSS */
-'#windy-plugin-gretathunberg{font-family:\'Roboto\',sans-serif;color:#000000}@font-face{font-family:\'MyWebFont\';src:url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\');src:url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'embedded-opentype\'),url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'woff2\'),url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'woff\'),url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'truetype\')}#windy-plugin-gretathunberg #details{display:block;z-index:9999;position:absolute;width:268px;top:65px;left:13px;background-image:linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.5));padding:15px 25px 10px 15px;font-size:14px;line-height:20px}#windy-plugin-gretathunberg #details hr{border-top:1px solid #ffffff94;border-bottom:1px solid #ffffff20;width:60%}#windy-plugin-gretathunberg #details .title{font-size:22px;font-weight:bold;margin-bottom:5px}#windy-plugin-gretathunberg #details .location a{text-decoration:none;color:#000000;cursor:pointer}#windy-plugin-gretathunberg #details .distanceNYC small{font-family:verdana;text-transform:uppercase;font-size:8px;color:#003300}#windy-plugin-gretathunberg #details .distance24{margin-top:5px;margin-bottom:5px}#windy-plugin-gretathunberg #details .localMeteoItem{min-width:50px;display:inline-block}#windy-plugin-gretathunberg #details .logoHolder{height:50px}#windy-plugin-gretathunberg #details .logoHolder img{height:50px}#windy-plugin-gretathunberg #details .logoHolder img.ybLogo{height:40px;padding:0px 0px 5px 25px;margin-bottom:5px}',
+'#windy-plugin-gretathunberg{font-family:\'Roboto\',sans-serif;color:#000000}@font-face{font-family:\'MyWebFont\';src:url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\');src:url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'embedded-opentype\'),url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'woff2\'),url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'woff\'),url(\'https://fonts.googleapis.com/css?family=Roboto:300,700\') format(\'truetype\')}#windy-plugin-gretathunberg #details{display:block;z-index:9999;position:absolute;width:268px;top:65px;left:13px;background-image:linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.5));padding:15px 25px 10px 15px;font-size:14px;line-height:20px}#windy-plugin-gretathunberg #details hr{border-top:1px solid #ffffff94;border-bottom:1px solid #ffffff20;width:60%}#windy-plugin-gretathunberg #details .title{font-size:22px;font-weight:bold;margin-bottom:5px}#windy-plugin-gretathunberg #details .location a{text-decoration:none;color:#000000;cursor:pointer}#windy-plugin-gretathunberg #details .distanceNYC small{font-family:verdana;text-transform:uppercase;font-size:8px;color:#003300}#windy-plugin-gretathunberg #details .distance24{margin-top:5px;margin-bottom:5px}#windy-plugin-gretathunberg #details .localMeteoItem{min-width:50px;display:inline-block}#logoHolder{height:50px}#logoHolder img{height:50px}#logoHolder img.ybLogo{height:40px;padding:0px 0px 5px 25px;margin-bottom:5px}',
 /* Constructor */
 function () {
   var pluginDataLoader = W.require('pluginDataLoader');
@@ -136,20 +136,23 @@ function () {
           }).addTo(markerGroup);
           markers.push(marker);
           marker.bindPopup(boatName);
-          var el = document.createElement('div');
-          el.setAttribute("id", "details");
-          el.innerHTML += "<div class='title'>DASHBOARD</div>";
-          el.innerHTML += "<hr align='left'><div class='lastseen'>Last seen: " + time2string(boat.timestamp) + "</div>";
-          el.innerHTML += "<div class='location'>Location: <a href='https://www.google.com/maps/search/?api=1&query=" + boat.lat + "," + boat.lon + "' target='_blank'>" + boat.lat + "," + boat.lon + "</a></div>";
-          el.innerHTML += "<hr align='left'><div class='sog'>Speed: " + boat.speedOverGround + " kn</div>";
-          el.innerHTML += "<div class='cog'>Heading:  " + boat.heading + "&deg;</div>";
-          el.innerHTML += "<div id='localMeteo'><hr align='left'>";
+
+          var _el = document.createElement('div');
+
+          _el.setAttribute("id", "details");
+
+          _el.innerHTML += "<div class='title'>DASHBOARD</div>";
+          _el.innerHTML += "<hr align='left'><div class='lastseen'>Last seen: " + time2string(boat.timestamp) + "</div>";
+          _el.innerHTML += "<div class='location'>Location: <a href='https://www.google.com/maps/search/?api=1&query=" + boat.lat + "," + boat.lon + "' target='_blank'>" + boat.lat + "," + boat.lon + "</a></div>";
+          _el.innerHTML += "<hr align='left'><div class='sog'>Speed: " + boat.speedOverGround + " kn</div>";
+          _el.innerHTML += "<div class='cog'>Heading:  " + boat.heading + "&deg;</div>";
+          _el.innerHTML += "<div id='localMeteo'><hr align='left'>";
 
           if (boat.temp != 0) {
-            el.innerHTML += "<div id='temp' class='temp'><div class='localMeteoItem'>Temp: </div>" + boat.temp + "&deg;C / " + Math.round(boat.temp * 1.8 + 32) + "&deg;F</div></div>";
+            _el.innerHTML += "<div id='temp' class='temp'><div class='localMeteoItem'>Temp: </div>" + boat.temp + "&deg;C / " + Math.round(boat.temp * 1.8 + 32) + "&deg;F</div></div>";
           }
 
-          el.innerHTML += "</div>";
+          _el.innerHTML += "</div>";
           getForecast('forecast', {
             model: 'gfsWaves',
             lat: parseFloat(boat.lat),
@@ -179,12 +182,11 @@ function () {
               document.getElementById('localMeteo').append(el_swell);
             }
           });
-          el.innerHTML += "<hr align='left'><div class='distanceNYC'>Distance to NYC:<br>" + Math.round(haversine(nycLat, nycLon, boat.lat, boat.lon) * 0.539957) + "NM <small>(Line-of-sight)</small></div>";
-          el.innerHTML += "<div class='distance24'>Est. Distance past 24 hrs:<br>" + Math.round(boat.distance24hrsKM * 0.539957) + "NM</div>";
-          el.innerHTML += "<div class='distanceCovered'>Est. Distance covered: <br>" + Math.round(boat.distanceKM * 0.539957) + "NM</div>";
-          el.innerHTML += "<hr align='left'><div class='logoHolder'><a href='https://www.followmychallenge.com/?gt' target='_blank'><img src='https://www.followmychallenge.com/windy/plugins/tracker/assets/images/logo_fmc_shadow.png' class='fmcLogo' alt='Map by: Follow My Challenge' /></a><a href='https://www.ybtracking.com/?gt' target='_blank'><img src='https://www.followmychallenge.com/windy/plugins/tracker/assets/images/logo_yb.png' class='ybLogo' alt='GPS Hardware by: YB Tracking' /></a></div>";
+          _el.innerHTML += "<hr align='left'><div class='distanceNYC'>Distance to NYC:<br>" + Math.round(haversine(nycLat, nycLon, boat.lat, boat.lon) * 0.539957) + "NM <small>(Line-of-sight)</small></div>";
+          _el.innerHTML += "<div class='distance24'>Est. Distance past 24 hrs:<br>" + Math.round(boat.distance24hrsKM * 0.539957) + "NM</div>";
+          _el.innerHTML += "<div class='distanceCovered'>Est. Distance covered: <br>" + Math.round(boat.distanceKM * 0.539957) + "NM</div>";
           removeElement('details');
-          document.getElementById('windy-plugin-gretathunberg').append(el);
+          document.getElementById('windy-plugin-gretathunberg').append(_el);
           map.panTo([boat.lat, boat.lon]);
         }
       } catch (error) {
@@ -206,6 +208,10 @@ function () {
     removeElement('details');
   };
 
+  var el = document.createElement('div');
+  el.setAttribute("id", "logoHolder");
+  el.innerHTML += "<a href='https://www.followmychallenge.com/?gt' target='_blank'><img src='https://www.followmychallenge.com/windy/plugins/tracker/assets/images/logo_fmc_shadow.png' class='fmcLogo' alt='Map by: Follow My Challenge' /></a><a href='https://www.ybtracking.com/?gt' target='_blank'><img src='https://www.followmychallenge.com/windy/plugins/tracker/assets/images/logo_yb.png' class='ybLogo' alt='GPS Hardware by: YB Tracking' /></a>";
+  document.getElementById('rh-bottom').prepend(el);
   var hasHooks = false;
 
   this.onopen = function () {
