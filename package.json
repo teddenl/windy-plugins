@@ -1,7 +1,7 @@
 {
-  "name": "windy-plugin-examples",
-  "version": "0.5.0",
-  "description": "Windy plugin system enables anyone, with basic knowledge of Javascript to enhance Windy with new functionality (default desc).",
+  "name": "windy-plugin-gretathunberg",
+  "version": "0.1.0",
+  "description": "Live GPS Tracker for Greta Thunberg's ocean crossing.",
   "main": "dist/plugin.js",
   "scripts": {
     "start": "node ./compiler.js --build --watch --prompt --serve --transpile",
@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/windycom/windy-plugins"
   },
-  "author": "Windyty, S.E.",
+  "author": "Tedde de Boer @ Follow My Challenge",
   "license": "MIT",
   "dependencies": {
     "@babel/core": "^7.1.2",

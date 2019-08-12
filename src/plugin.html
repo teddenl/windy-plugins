@@ -1,14 +1,218 @@
 <plugin>
-
-	<b>This plugin will rock</b>
-
 	<script>
+	import map from '@windy/map';
+	import pluginDataLoader from '@windy/pluginDataLoader';
 
-	console.log('I am mounted to the page')
+	const nycLat = '40.689086';
+    const nycLon = '-74.045013';
+	const localMeteo = 0;
+	const markers = [];
+    const markerIcons = [];
+    const markerGroup = L.layerGroup().addTo(map);
+    const getForecast = pluginDataLoader({ key: 'FYZH0HjPk86Xr5Xz0KO7Aht5wR1dp6J7', plugin: 'windy-plugin-gretathunberg' })
+	let boatTrackLayer;
 
-	this.onopen = () => console.log('I am opened')
+    const BoatIcon = L.icon({
+        iconUrl: 'https://www.followmychallenge.com/windy/plugins/tracker/assets/images/boat64x64.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [-3, -90],
+        zIndexOffset: 999
+    });
 
-	this.onclose = () => console.log('I am being closed')
+    const time2string = (timestamp) => {
+	    timestamp = Math.floor(Date.now() / 1000) - timestamp;
+	    const days = Math.floor(timestamp / 86400);
+	    const hours = Math.floor((timestamp - (days * 86400)) / 3600);
+	    const minutes = Math.floor((timestamp - (days * 86400) - (hours * 3600)) / 60);
+	    if (hours) {
+			return hours + ' hr ' + minutes + ' min';
+	    } else {
+			return minutes + ' min';
+	    }
+	}   
+
+	const getDate = () => {
+		let today = new Date();
+		let dd = String(today.getDate()).padStart(2, '0');
+		let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+		let yyyy = today.getFullYear();
+
+		today = yyyy + '-' + mm + '-' + dd;
+		return today;
+	}
+
+	const toRad = (value) => {
+	    return value * Math.PI / 180;
+	}
+
+	const haversine = (lat1,lon1,lat2,lon2) => {
+		const R = 6371; // km
+		const dLat = toRad(lat2-lat1);
+		const dLon = toRad(lon2-lon1);
+		const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		 
+		Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+		 
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		const d = Math.round(R * c);
+
+		return d;
+	}
+
+    const updateIconStyle = () => {
+        for (const marker of markers) {
+            if (marker._icon) {
+                const heading = marker._icon.getAttribute('data-heading');
+            if (marker._icon.style.transform.indexOf('rotateZ') === -1) {
+                marker._icon.style.transform = `${marker._icon.style.transform} rotateZ(${(heading || 0)}deg)`;
+                marker._icon.style.transformOrigin = 'center';
+            }
+          }
+        }
+    } 
+
+    const removeElement = (elementId) => {
+        const element = document.getElementById(elementId);
+        if(element) { 
+        	element.parentNode.removeChild(element);
+        }
+    }   
+
+    function onClick(e) {
+        window.open(this.options.url);
+    }
+
+    const loadMap = () => {
+        fetch('https://www.followmychallenge.com/live/gretathunberg/feed.php')
+        .then(response => response.json())
+        .then(result => result.result)
+        .then(result => {
+            try {
+
+                for (const boatName of Object.keys(result)) {
+              
+                    if(map.hasLayer(boatTrackLayer)) {
+                        map.removeLayer(boatTrackLayer);
+                    }
+
+                    const boat = result[boatName];
+
+                    boatTrackLayer = L.polyline(boat.track, {
+                    	color: `hsl(60, 100%, 45%)`,
+                    	weight: 2,
+                    }).addTo(map);             
+
+                    const marker = L.marker(boat.track[boat.track.length - 1], {
+                        icon: BoatIcon,
+                        rotationAngle: boat.heading
+                    }).addTo(markerGroup);
+
+                    markers.push(marker);
+                    marker.bindPopup(boatName);
+                    
+                    var el = document.createElement('div');
+                    el.setAttribute("id", "details");
+                    el.innerHTML += "<div class='title'>DASHBOARD</div>";
+                    el.innerHTML += "<hr align='left'><div class='lastseen'>Last seen: " + time2string(boat.timestamp) + "</div>";
+                    el.innerHTML += "<div class='location'>Location: <a href='https://www.google.com/maps/search/?api=1&query=" + boat.lat + "," + boat.lon + "' target='_blank'>" + boat.lat + "," + boat.lon + "</a></div>";
+                    el.innerHTML += "<hr align='left'><div class='sog'>Speed: " + boat.speedOverGround + " kn</div>";
+                    el.innerHTML += "<div class='cog'>Heading:  " + boat.heading + "&deg;</div>";
+                    el.innerHTML += "<div id='localMeteo'><hr align='left'>";
+
+                    if(boat.temp != 0) {
+						el.innerHTML += "<div id='temp' class='temp'><div class='localMeteoItem'>Temp: </div>" + boat.temp + "&deg;C / " + Math.round((boat.temp*1.8) + 32) + "&deg;F</div></div>";
+                    }
+
+                    el.innerHTML += "</div>";
+    
+					getForecast('forecast', { model: 'gfsWaves', lat: parseFloat(boat.lat), lon: parseFloat(boat.lon) } ).then( result => { // Get local forecast data
+						const { status, data } = result; 
+						
+						if(data['data'][getDate()][0]['wind']) { // Append local wind if available
+							const el_wind = document.createElement('div');
+							el_wind.setAttribute("id", "wind");
+							el_wind.innerHTML += "<div class='localMeteoItem'>Wind: </div>" + data['data'][getDate()][0]['wind'] + " m/s / " + data['data'][getDate()][0]['windDir'] + "&deg;";
+							document.getElementById('localMeteo').append(el_wind);
+	                    }
+
+	                    if(data['data'][getDate()][0]['waves']) { // Append local waves if available
+							const el_waves = document.createElement('div');
+							el_waves.setAttribute("id", "waves");
+							el_waves.innerHTML += "<div class='localMeteoItem'>Waves: </div>" + data['data'][getDate()][0]['waves'] + " m / " + data['data'][getDate()][0]['wavesDir'] + "&deg;";
+							document.getElementById('localMeteo').append(el_waves);
+	                    }
+
+	                    if(data['data'][getDate()][0]['swell1']) { // Append local swell if available
+							const el_swell = document.createElement('div');
+							el_swell.setAttribute("id", "swell1");
+							el_swell.innerHTML += "<div class='localMeteoItem'>Swell: </div>" + data['data'][getDate()][0]['swell1'] + " m / " + data['data'][getDate()][0]['swell1Dir'] + "&deg;";
+							document.getElementById('localMeteo').append(el_swell);
+	                    }
+					})
+
+                    el.innerHTML += "<hr align='left'><div class='distanceNYC'>Distance to NYC:<br>" + Math.round(haversine(nycLat,nycLon,boat.lat,boat.lon)*0.539957) + "NM <small>(Line-of-sight)</small></div>";
+                    el.innerHTML += "<div class='distance24'>Est. Distance past 24 hrs:<br>" + Math.round(boat.distance24hrsKM*0.539957) + "NM</div>";
+                    el.innerHTML += "<div class='distanceCovered'>Est. Distance covered: <br>" + Math.round(boat.distanceKM*0.539957) + "NM</div>";
+
+                    el.innerHTML += "<hr align='left'><div class='logoHolder'><a href='https://www.followmychallenge.com/?gt' target='_blank'><img src='https://www.followmychallenge.com/windy/plugins/tracker/assets/images/logo_fmc_shadow.png' class='fmcLogo' alt='Map by: Follow My Challenge' /></a><a href='https://www.ybtracking.com/?gt' target='_blank'><img src='https://www.followmychallenge.com/windy/plugins/tracker/assets/images/logo_yb.png' class='ybLogo' alt='GPS Hardware by: YB Tracking' /></a></div>";
+                    
+                    removeElement('details'); // If the dashboard overlay exists, remove in order to add updated version
+                    
+                    document.getElementById('windy-plugin-gretathunberg').append(el); // Add dashboard overlay
+
+                    map.panTo([boat.lat,boat.lon]); // Focus on boat location
+                }
+            } catch (error) {
+                console.error(`Error: ${error.message}`);
+            }
+        })
+        .catch(error => {
+            console.error(`Error boats: ${error.message}`);
+        });
+    }
+
+	(function (i, s, o, g, r, a, m) {
+	    i['GoogleAnalyticsObject'] = r;
+	    i[r] = i[r] || function () {
+	        (i[r].q = i[r].q || []).push(arguments)
+	    }, i[r].l = 1 * new Date();
+	    a = s.createElement(o),
+	        m = s.getElementsByTagName(o)[0];
+	    a.async = 1;
+	    a.src = g;
+	    m.parentNode.insertBefore(a, m)
+	})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+	ga('multifmc.send', 'pageview');
+	ga('create', 'UA-64997129-25', { 'name': 'followmychallenge' });
+	ga('followmychallenge.send', 'pageview');
+
+	setInterval(function() {
+		markerGroup.clearLayers();
+		loadMap();             
+		ga('create', 'UA-64997129-25', {'name':'followmychallenge'});
+		ga('followmychallenge.send', 'event', 'Reloaders', 'auto_reload', location.pathname);
+	}, 60000); // updater 60 sec
+
+    const remove = () => {
+        map.removeLayer(boatTrackLayer); // remove track
+        markerGroup.clearLayers(); // remove markers
+        removeElement('details'); // remove Dashboard overlay
+    }
+
+    let hasHooks = false
+
+    this.onopen = () => {
+    	if( hasHooks ) return
+    	loadMap()
+    	hasHooks = true
+    }
+
+    this.onclose = () => {
+    	if(!hasHooks) return
+    	remove()
+    	hasHooks = false
+    }
 
 	</script>
 </plugin>

@@ -6,6 +6,77 @@
 
 }
 
-#windy-plugin-myname {
+#windy-plugin-gretathunberg {
+	@font-face {
+	  font-family: 'MyWebFont';
+	  src: url('https://fonts.googleapis.com/css?family=Roboto:300,700'); /* IE9 Compat Modes */
+	  src: url('https://fonts.googleapis.com/css?family=Roboto:300,700') format('embedded-opentype'), /* IE6-IE8 */
+	       url('https://fonts.googleapis.com/css?family=Roboto:300,700') format('woff2'), /* Super Modern Browsers */
+	       url('https://fonts.googleapis.com/css?family=Roboto:300,700') format('woff'), /* Pretty Modern Browsers */
+	       url('https://fonts.googleapis.com/css?family=Roboto:300,700')  format('truetype'), /* Safari, Android, iOS */
+	}
+
+	font-family: 'Roboto', sans-serif;
+    color: #000000;
+
+	#details {
+		display: block;
+	    z-index: 9999;
+	    position: absolute;
+	    width: 268px;
+	    top: 65px;
+	    left: 13px;
+	    background-image: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.5));
+	    padding: 15px 25px 10px 15px;
+	    font-size: 14px;
+	    line-height: 20px;
+	}
+	#details hr {
+	    border-top: 1px solid #ffffff94;
+	    border-bottom: 1px solid #ffffff20;
+	    width:60%;
+	}
+	#details .title {
+		font-size: 22px;
+	    font-weight: bold;
+	    margin-bottom: 5px;
+	}
+
+	#details .location a {
+	    text-decoration: none;
+	    color: #000000;
+	    cursor: pointer;
+	}
+
+	#details .distanceNYC small {
+	    font-family: verdana;
+	    text-transform: uppercase;
+	    font-size: 8px;
+	    color: #003300;
+	}
+
+	#details .distance24 {
+	    margin-top: 5px;
+	    margin-bottom: 5px;
+	}
+
+	#details .localMeteoItem {
+		min-width:50px;
+		display: inline-block;
+	}
+
+	#details .logoHolder {
+		height:50px;
+	}
+
+	#details .logoHolder img {
+		height:50px;
+	}
+
+	#details .logoHolder img.ybLogo {
+		height: 40px;
+	    padding: 0px 0px 5px 25px;
+	    margin-bottom: 5px;
+	}
 
 }
